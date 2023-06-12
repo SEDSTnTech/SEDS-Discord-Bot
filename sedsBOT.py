@@ -10,6 +10,8 @@ import snscrape.modules.twitter as sn
 import pandas as pd
 import re
 import random
+import requests
+from bs4 import BeautifulSoup
 
 TOKEN = getToken()
 
