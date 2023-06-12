@@ -481,6 +481,52 @@ async def addReactTemp(ctx):
 # ********************** Misc ******************************
 # **********************************************************
 
+
+@bot.command()
+async def wiki(ctx):
+    URL = "https://en.wikipedia.org/wiki/Special:Random"
+    page = requests.get(URL)
+    while (not page):
+        page = requests.get(URL)
+
+    soup = BeautifulSoup(page.content, "html.parser")
+
+    title = soup.find("h1", class_="firstHeading mw-first-heading")
+
+    link_ext = title.text.replace(" ", "_")
+    link = "https://en.wikipedia.org/wiki/" + link_ext
+
+    try:
+        page_test = requests.get(link)
+
+    except:
+        await ctx.send("Failed to get page at:", link)
+
+    paragraph = soup.find_all("p")
+
+    for p in paragraph:
+        p = p.text.replace("\n", "")
+        if (p.replace(" ", "") and p.replace("\n", "")):
+            if (len(p) != 0):
+                desc = p
+                break
+
+    embed = discord.Embed(title=title.text, url=link, description=desc)
+
+    print(f"Getting page '{title.text}' at {link}")
+
+    img = soup.find("a", class_="image")
+    if (img):
+        img = str(img).split(" ")
+        for i in img:
+            if ("src=\"" in i):
+                i = i.replace("src=\"", "")
+                img_url = i[:-1]
+                img_url = "https:" + img_url
+        embed.set_image(url=img_url)
+
+    await ctx.send(embed=embed)
+
 @bot.command(name='add')
 async def _add(ctx, arg1: int, arg2: int):
     await ctx.send('{} + {} = {}'.format(arg1, arg2, arg1 + arg2))
